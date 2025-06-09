@@ -126,6 +126,13 @@
             result.href = txt; // Set the href attribute to the scanned result
             result.classList.remove("hidden"); // Show the link
             window.open(txt, "_blank"); // Open the link in a new tab
+            
+            // Stop the QR code reader
+            reader.stop().then(() => {
+              qrReader.classList.add("hidden"); // Hide the QR reader
+            }).catch((err) => {
+              console.error("Failed to stop the QR reader:", err);
+            });
           },
           () => {}
         );
