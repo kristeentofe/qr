@@ -1,169 +1,193 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <title>QR Code Scanner & Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimal-ui" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-  />
-  <script src="https://unpkg.com/html5-qrcode" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js" defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elegant HTML5 QR Code Scanner</title>
   <style>
-    /* Override Tailwind container max-width for full width on small */
-    #qr-reader {
-      width: 100%;
-      border-radius: 0.5rem;
-      overflow: hidden;
+    :root {
+      --color-bg: #ffffff;
+      --color-text: #374151;
+      --color-text-muted: #6b7280;
+      --color-primary: #111827;
+      --color-input-bg: #f9fafb;
+      --color-input-border: #d1d5db;
+      --color-input-focus-border: #2563eb;
+      --color-btn-bg: #111827;
+      --color-btn-text: #ffffff;
+      --border-radius: 0.75rem;
+      --shadow-card: 0 4px 12px rgba(0,0,0,0.06);
+      --transition-fast: 0.2s ease-in-out;
+      --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
-    /* Ensure the layout is optimized for portrait mode */
-    @media only screen and (orientation: portrait) {
-      body {
-        flex-direction: column;
-      }
-      main {
-        padding: 2rem 1rem; /* Adjust padding for better spacing */
-      }
+    html, body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 5rem 1rem;
+    }
+    .container {
+      max-width: 700px;
+      width: 100%;
+      background: var(--color-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-card);
+      padding: 3rem 3rem 4rem;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 3rem;
+      margin: 0 0 1rem 0;
+      color: var(--color-primary);
+      line-height: 1.1;
+    }
+    p.description {
+      color: var(--color-text-muted);
+      font-size: 1.125rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.4;
+      user-select: none;
+    }
+    #qr-reader {
+      margin: 0 auto 2.5rem;
+      max-width: 400px;
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      border: 2px solid var(--color-input-border);
+      border-radius: var(--border-radius);
+      background-color: var(--color-input-bg);
+      color: var(--color-text);
+      outline-offset: 3px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      caret-color: var(--color-input-focus-border);
+      user-select: text;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus {
+      border-color: var(--color-input-focus-border);
+      box-shadow: 0 0 14px rgba(37, 99, 235, 0.45);
+      background-color: #fff;
+    }
+    .scanned-result {
+      margin-top: 2rem;
+      font-size: 1.125rem;
+      color: var(--color-text-muted);
+      min-height: 1.5em;
+      font-style: italic;
+      word-break: break-word;
+      user-select: text;
+    }
+    button#stop-scan {
+      margin-top: 1.5rem;
+      background-color: var(--color-btn-bg);
+      color: var(--color-btn-text);
+      border: none;
+      padding: 0.75rem 1.75rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+    button#stop-scan:hover,
+    button#stop-scan:focus {
+      background-color: #1e40af;
+      outline: none;
     }
   </style>
 </head>
-<body class="flex flex-col min-h-screen bg-white font-sans">
-  <!-- Header with PSA logo and title -->
-  <header class="bg-gray-300 flex flex-col items-center py-6">
-    <img
-      src="icon.png"
-      alt="Philippine Statistics Authority logo with globe and arrows in blue, yellow, and red"
-      class="h-24 w-auto mb-6"
-      width="150"
-      height="150"
+<body>
+  <main class="container" role="main">
+    <h1>Elegant HTML5 QR Code Scanner</h1>
+    <p class="description">
+      Use your device camera to scan a QR code below. The scanned content will populate the input field automatically.
+    </p>
+    <div id="qr-reader" aria-label="QR code scanner viewfinder"></div>
+    <input
+      type="text"
+      id="qrCodeInput"
+      placeholder="Scanned QR code data will appear here"
+      autocomplete="off"
+      spellcheck="false"
+      inputmode="text"
+      aria-label="QR code input field"
+      readonly
     />
-    <h1 class="text-black font-extrabold text-3xl">QR SCANNER</h1>
-  </header>
-
-  <!-- Main app container -->
-  <main class="flex-grow container mx-auto px-4 py-8 max-w-5xl">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Scanner Card -->
-      <section
-        class="bg-white rounded-2xl p-6 shadow-md flex flex-col items-center text-center"
-      >
-        <h3 class="text-lg font-semibold mb-4">🎥</h3>
-        <button
-          id="start-scanner-btn"
-          class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded w-full mb-4"
-          type="button"
-        >
-          Start Camera
-        </button>
-        <div id="qr-reader" class="hidden w-full rounded-md border border-gray-300"></div>
-        <a id="qr-result" class="text-green-600 font-bold mt-4 min-h-[1.5rem] hidden" target="_blank"></a> <!-- Clickable result -->
-        <button
-          id="copy-btn"
-          class="hidden bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-1 px-3 rounded w-full mt-4"
-          type="button"
-        >
-          📋 Copy Result
-        </button>
-      </section>
-
-      <!-- Generator Card -->
-      <section
-        class="bg-white rounded-2xl p-6 shadow-md flex flex-col items-center text-center"
-      >
-        <h3 class="text-lg font-semibold mb-4">🔧 QR Code Generator</h3>
-        <form id="qr-form" class="w-full">
-          <input
-            type="text"
-            id="text"
-            placeholder="Enter text or URL"
-            class="border border-gray-300 rounded-md p-2 w-full mb-4"
-            required
-          />
-          <button
-            type="submit"
-            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full"
-          >
-            Generate QR Code
-          </button>
-        </form>
-        <div id="qr-code" class="mt-4"></div>
-        <a id="download-link" class="hidden" download="qrcode.png">Download QR Code</a>
-      </section>
-    </div>
+    <div class="scanned-result" aria-live="polite" aria-atomic="true" id="resultDisplay"></div>
+    <button id="stop-scan" aria-label="Stop scanning">Stop Scanning</button>
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-gray-300 py-6 text-center font-extrabold text-xl">
-    MADE BY :<br />
-    CRISTOFER AMORES
-  </footer>
-
+  <script src="https://unpkg.com/html5-qrcode@2.3.4/html5-qrcode.min.js"></script>
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const $ = (id) => document.getElementById(id),
-        result = $("qr-result"),
-        link = $("download-link"),
-        copyBtn = $("copy-btn"),
-        qrReader = $("qr-reader"),
-        startBtn = $("start-scanner-btn");
-      let reader;
+    (function() {
+      const resultDisplay = document.getElementById('resultDisplay');
+      const qrCodeInput = document.getElementById('qrCodeInput');
+      const stopScanBtn = document.getElementById('stop-scan');
 
-      // Start Scanner
-      window.startScanner = () => {
-        qrReader.classList.remove("hidden");
-        if (!reader) reader = new Html5Qrcode("qr-reader");
-        reader.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: 250 },
-          (txt) => {
-            // Set the scanned result as the link and make it visible
-            result.textContent = txt; // Set the link text
-            result.href = txt; // Set the href attribute to the scanned result
-            result.classList.remove("hidden"); // Show the link
-            
-            // Stop the QR code reader
-            reader.stop().then(() => {
-              qrReader.classList.add("hidden"); // Hide the QR reader
-            }).catch((err) => {
-              console.error("Failed to stop the QR reader:", err);
-            });
-          },
-          () => {}
-        );
-      };
+      let html5QrcodeScanner;
 
-      startBtn.addEventListener("click", () => {
-        window.startScanner();
-      });
-
-      // Copy result
-      window.copyResult = () =>
-        navigator.clipboard.writeText(result.textContent).then(() => alert("Copied!"));
-
-      copyBtn.addEventListener("click", () => {
-        window.copyResult();
-      });
-
-      // Generate QR
-      $("qr-form").addEventListener("submit", (e) => {
-        e.preventDefault();
-        const text = $("text").value.trim();
-        $("qr-code").innerHTML = "";
-        if (!text) return;
-        QRCode.toCanvas(text, { width: 200 }, (err, canvas) => {
-          if (err) return;
-          $("qr-code").appendChild(canvas);
-          link.href = canvas.toDataURL("image/png");
-          link.classList.remove("hidden");
+      function onScanSuccess(decodedText) {
+        qrCodeInput.value = decodedText;
+        resultDisplay.textContent = decodedText;
+        // Stop scanning after first successful decode
+        html5QrcodeScanner.clear().catch(error => {
+          // console.warn('Failed to clear QR scanner: ', error);
         });
+        stopScanBtn.disabled = true;
+      }
+
+      function onScanError(errorMessage) {
+        // No visual or console noise here for typical scanning errors
+      }
+
+      function startScanner() {
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        html5QrcodeScanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            disableFlip: false
+          },
+          onScanSuccess,
+          onScanError
+        ).catch(err => {
+          resultDisplay.textContent = `Camera start failed: ${err}`;
+        });
+      }
+
+      stopScanBtn.addEventListener('click', () => {
+        if (html5QrcodeScanner) {
+          html5QrcodeScanner.stop().then(() => {
+            resultDisplay.textContent = 'Scanning stopped.';
+            stopScanBtn.disabled = true;
+          }).catch(err => {
+            resultDisplay.textContent = `Failed to stop scanning: ${err}`;
+          });
+        }
       });
-    });
+
+      // Init scanner on page load
+      window.addEventListener('DOMContentLoaded', () => {
+        startScanner();
+        stopScanBtn.disabled = false;
+      });
+    })();
   </script>
 </body>
 </html>
+
 
